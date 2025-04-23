@@ -1,13 +1,18 @@
 import "./App.css";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import UserHomePage from "./pages/worker/UserHomePage";
+import WorkerHomePage from "./pages/worker/WorkerHomePage";
+import WorkerLoginPage from "./pages/worker/WorkerLoginPage";
+import { SnackbarProvider } from "./components/SnackbarContext";
 
 function App() {
   return (
     <BrowserRouter>
-      <Routes>
-        <Route path="/UserHomePage" element={<UserHomePage />} />
-      </Routes>
+      <SnackbarProvider>
+        <Routes>
+          <Route path="/worker/home" element={<WorkerHomePage />} />
+          <Route path="/worker/login" element={<WorkerLoginPage />} />
+        </Routes>
+      </SnackbarProvider>
     </BrowserRouter>
   );
 }
