@@ -29,10 +29,16 @@ const WorkLocation: React.FC<WorkLocationProps> = ({ workerId }) => {
         {name ? (
           <>
             <Typography color="gray" sx={{ fontSize: "0.7rem" }}>
-              {name}님의 작업 위치:
+              <Box
+                component="span"
+                sx={{ color: "black", fontWeight: "bold", fontSize: "1rem" }}
+              >
+                {name}
+              </Box>
+              님의 작업 위치:
             </Typography>
 
-            <Typography sx={{ mt: 1, fontWeight: "bold" }}>
+            <Typography sx={{ mt: 1, fontWeight: "bold", fontSize: "2rem" }}>
               {location || "위치 정보 없음"}
             </Typography>
           </>
