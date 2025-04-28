@@ -1,49 +1,68 @@
-import React from "react";
-import { Card, Typography, Box } from "@mui/material";
+import React, { useEffect, useState } from "react";
+import { Card, Typography, Box, CircularProgress } from "@mui/material";
+import axios from "axios";
 
-const userNameMap: Record<number, string> = {
-  1: "김경비",
-  2: "박보안",
-  3: "이순찰",
-  4: "유경비",
+type ProfileInfo = {
+  work_name: string;
+  location_name: string;
 };
 
-const workLocationMap: Record<string, string> = {
-  김경비: "서울 A빌딩 정문",
-  박보안: "부산 스마트타워",
-  이순찰: "인천항 물류센터",
-  유경비: "대구 시청 앞",
-};
+const WorkLocation: React.FC = () => {
+  const [profile, setProfile] = useState<ProfileInfo | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-type WorkLocationProps = {
-  workerId: number;
-};
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const token = localStorage.getItem("token"); // 🔥 토큰 꺼내기
 
-const WorkLocation: React.FC<WorkLocationProps> = ({ workerId }) => {
-  const name = userNameMap[workerId];
-  const location = name ? workLocationMap[name] : undefined;
+        const response = await axios.get<ProfileInfo>(
+          "/api/worker/profile-info",
+          {
+            headers: {
+              Authorization: `Bearer ${token}`, // 🔥 헤더에 토큰 추가
+            },
+          }
+        );
+
+        setProfile(response.data);
+      } catch (error) {
+        console.error("프로필 정보를 불러오는 데 실패했습니다:", error);
+        setError("프로필 정보를 불러오지 못했습니다.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProfile();
+  }, []);
 
   return (
     <Box display="flex" justifyContent="center" mt={2} px={1}>
-      <Card sx={{ p: 1, width: "100%", maxWidth: 400, textAlign: "center" }}>
-        {name ? (
+      <Card sx={{ p: 2, width: "100%", maxWidth: 400, textAlign: "center" }}>
+        {loading ? (
+          <CircularProgress />
+        ) : error ? (
+          <Typography color="error">{error}</Typography>
+        ) : profile ? (
           <>
             <Typography color="gray" sx={{ fontSize: "0.7rem" }}>
               <Box
                 component="span"
                 sx={{ color: "black", fontWeight: "bold", fontSize: "1rem" }}
               >
-                {name}
+                {profile.work_name}
               </Box>
               님의 작업 위치:
             </Typography>
 
             <Typography sx={{ mt: 1, fontWeight: "bold", fontSize: "2rem" }}>
-              {location || "위치 정보 없음"}
+              {profile.location_name || "위치 정보 없음"}
             </Typography>
           </>
         ) : (
-          <Typography color="error">사용자 정보가 존재하지 않습니다</Typography>
+          <Typography color="error">프로필 정보를 찾을 수 없습니다.</Typography>
         )}
       </Card>
     </Box>
