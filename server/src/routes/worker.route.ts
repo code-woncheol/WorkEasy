@@ -17,6 +17,16 @@ router.post("/clock-in", verifyToken, async (req, res): Promise<void> => {
   const userId = (req as any).user.userId;
 
   try {
+    // ✅ 1. 먼저 worker 테이블에서 본인의 work_location_id 가져오기
+    const [workerRows] = await pool.query<RowDataPacket[]>(
+      `SELECT work_location_id FROM worker WHERE worker_id = ?`,
+      [userId]
+    );
+    if (workerRows.length === 0) {
+      res.status(404).json({ message: "사용자 정보 없음" });
+      return;
+    }
+    const workLocationId = workerRows[0].work_location_id;
     const [existing] = await pool.query<RowDataPacket[]>(
       `SELECT * FROM work_log 
          WHERE worker_id = ? AND DATE(clock_in) = CURDATE()`,
@@ -31,11 +41,13 @@ router.post("/clock-in", verifyToken, async (req, res): Promise<void> => {
       return;
     }
 
+    // ✅ 3. 출근 기록에 worker_id + clock_in + location_id 함께 삽입
     await pool.query(
-      `INSERT INTO work_log (worker_id, clock_in) VALUES (?, NOW())`,
-      [userId]
+      `INSERT INTO work_log (worker_id, clock_in, location_id) VALUES (?, NOW(), ?)`,
+      [userId, workLocationId]
     );
 
+    // ✅ 4. worker 테이블 상태를 근무중으로 업데이트
     await pool.query(
       `UPDATE worker SET is_working_now = 1 WHERE worker_id = ?`,
       [userId]
