@@ -1,7 +1,7 @@
 // src/components/WorkLog.tsx
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { sortBy } from "lodash";
+import { orderBy, sortBy } from "lodash";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import { Box, Typography } from "@mui/material"; // 🔥 추가
 
@@ -32,7 +32,7 @@ const WorkLog = () => {
     const fetchLogs = async () => {
       try {
         const response = await axios.get<WorkLog[]>("/api/work-log");
-        const sortedLogs = sortBy(response.data, "worked_minutes");
+        const sortedLogs = orderBy(response.data, ["clock_in"], ["desc"]);
         setLogs(sortedLogs);
       } catch (error) {
         console.error("출퇴근 데이터 불러오기 실패:", error);
