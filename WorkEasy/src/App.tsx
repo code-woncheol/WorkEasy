@@ -4,12 +4,14 @@ import WorkerHomePage from "./pages/worker/WorkerHomePage";
 import WorkerLoginPage from "./pages/worker/WorkerLoginPage";
 import { SnackbarProvider } from "./components/SnackbarContext";
 import AdminHomePage from "./pages/admin/AdminHomePage";
+import TestPage from "./pages/admin/TestPage";
 
 function App() {
   return (
     <BrowserRouter>
       <SnackbarProvider>
         <Routes>
+          <Route path="/admin/test" element={<TestPage />} />
           <Route path="/admin/home" element={<AdminHomePage />} />
           <Route path="/worker/home" element={<WorkerHomePage />} />
           <Route path="/worker/login" element={<WorkerLoginPage />} />
